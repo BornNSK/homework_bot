@@ -102,7 +102,6 @@ def main():
     if not check_tokens():
         logging.critical('Проверьте токены.')
         sys.exit()
-
     while True:
         try:
             api = get_api_answer(params)
