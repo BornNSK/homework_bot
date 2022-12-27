@@ -107,7 +107,7 @@ def main():
         try:
             api = get_api_answer(params)
             homeworks = check_response(api)
-            if len (homeworks) != 0:
+            if len(homeworks) != 0:
                 new_status = parse_status(homeworks)
                 send_message(bot, new_status)
             logging.debug("Статус работы не изменился.")
@@ -117,24 +117,6 @@ def main():
             send_message(bot, message)
         finally:
             time.sleep(RETRY_PERIOD)
-    
-
-
-
-    # while True:
-    #     try:
-    #         api = get_api_answer(timestamp)
-    #         homework = check_response(api)
-    #         status = parse_status(homework)
-    #         if status != 0:
-    #             send_message(bot, status)
-    #             time.sleep(RETRY_PERIOD)
-    #     except Exception as error:
-    #         message = f'Сбой в работе программы: {error}'
-    #         logging.error(message)
-    #         send_message(bot, message)
-    #     finally:
-    #         time.sleep(RETRY_PERIOD)
 
 
 if __name__ == '__main__':
