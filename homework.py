@@ -4,7 +4,6 @@ import time
 import telegram
 import logging
 import requests
-from telegram.ext import Updater
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -25,8 +24,6 @@ TELEGRAM_CHAT_ID = os.getenv('TELEGRAM_CHAT_ID')
 RETRY_PERIOD = 600
 ENDPOINT = 'https://practicum.yandex.ru/api/user_api/homework_statuses/'
 HEADERS = {'Authorization': f'OAuth {PRACTICUM_TOKEN}'}
-
-UPDATER = Updater(token=TELEGRAM_TOKEN)
 
 HOMEWORK_VERDICTS = {
     'approved': 'Работа проверена: ревьюеру всё понравилось. Ура!',
