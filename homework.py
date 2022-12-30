@@ -4,6 +4,7 @@ import time
 import telegram
 import logging
 import requests
+from exceptions import ApiError, UnknownStatus
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -48,12 +49,13 @@ def send_message(bot, message):
 
 def get_api_answer(timestamp):
     """Получаем ответ от API."""
+    params = {'from_date': timestamp}
     try:
-        request = requests.get(ENDPOINT, headers=HEADERS, params=timestamp)
+        request = requests.get(ENDPOINT, headers=HEADERS, params=params)
     except requests.exceptions.RequestException as error:
         logging.error(f'Ошибка при запросе к основному API: {error}')
     if request.status_code != 200:
-        raise Exception(f'ошибка доступа к API. Код:{request.status_code}')
+        raise ApiError(f'Ошибка доступа к API. Код:{request.status_code}')
     return request.json()
 
 
@@ -81,7 +83,7 @@ def parse_status(homework):
     homework_name = homework["homework_name"]
     homework_status = homework["status"]
     if homework_status not in HOMEWORK_VERDICTS:
-        raise Exception(f'Неизвестный статус работы: {homework_status}')
+        raise UnknownStatus(f'Неизвестный статус работы: {homework_status}')
     verdict = HOMEWORK_VERDICTS[homework_status]
     return f'Изменился статус проверки работы "{homework_name}". {verdict}'
 
@@ -90,18 +92,19 @@ def main():
     """Основная логика работы бота."""
     bot = telegram.Bot(token=TELEGRAM_TOKEN)
     timestamp = int(time.time())
-    params = {'from_date': timestamp}
+    temp_status = ''
     if not check_tokens():
         logging.critical('Проверьте токены.')
         sys.exit()
     while True:
         try:
-            api = get_api_answer(params)
+            api = get_api_answer(timestamp)
             homeworks = check_response(api)
-            if len(homeworks) != 0:
+            if len(homeworks) != 0 and temp_status != homeworks ['status']:
                 new_status = parse_status(homeworks)
                 send_message(bot, new_status)
-            logging.debug("Статус работы не изменился.")
+                temp_status = homeworks['status']
+            logging.debug("Статус работы не изменился.") 
         except Exception as error:
             message = f'Сбой в работе программы: {error}'
             logging.error(message)
