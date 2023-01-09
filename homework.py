@@ -100,7 +100,7 @@ def main():
         try:
             api = get_api_answer(timestamp)
             homeworks = check_response(api)
-            if len(homeworks) != 0 and temp_status != homeworks['status']:
+            if homeworks and temp_status != homeworks['status']:
                 new_status = parse_status(homeworks)
                 send_message(bot, new_status)
                 temp_status = homeworks['status']
